@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Afg AI Chat</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --bg: #ffffff;
+            --user-bg: #3b82f6;
+            --ai-bg: #f1f5f9;
+            --text: #1e293b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-container {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            max-width: 800px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .message {
+            margin: 1rem 0;
+            padding: 1rem;
+            border-radius: 1rem;
+            max-width: 80%;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .user {
+            background: var(--user-bg);
+            color: white;
+            margin-left: auto;
+        }
+
+        .ai {
+            background: var(--ai-bg);
+            color: var(--text);
+            margin-right: auto;
+            border: 1px solid #e2e8f0;
+        }
+
+        .input-container {
+            padding: 1rem;
+            background: var(--bg);
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .input-box {
+            display: flex;
+            gap: 0.5rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        input {
+            flex: 1;
+            padding: 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+        }
+
+        button {
+            padding: 1rem 1.5rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container" id="chat">
+        <div class="message ai">
+            Hello! I'm Afg AI. Ask me anything.
+        </div>
+    </div>
+
+    <div class="input-container">
+        <div class="input-box">
+            <input type="text" id="input" placeholder="Type your message...">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        const chat = document.getElementById('chat');
+        const input = document.getElementById('input');
+
+        function addMessage(text, isUser) {
+            const msg = document.createElement('div');
+            msg.className = `message ${isUser ? 'user' : 'ai'}`;
+            msg.textContent = text;
+            chat.appendChild(msg);
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const message = input.value.trim();
+            if (!message) return;
+
+            addMessage(message, true);
+            input.value = '';
+
+            // Simulated AI response
+            const response = await getAIResponse(message);
+            addMessage(response, false);
+        }
+
+        async function getAIResponse(prompt) {
+            // Replace with real API call
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve(`I received: "${prompt}". This is a simulated response.`);
+                }, 1000);
+            });
+        }
+
+        // Enter key support
+        input.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+    </script>
+</body>
+</html>
