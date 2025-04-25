@@ -3,145 +3,233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Afg AI Chat</title>
+    <title>AI Chat Interface</title>
     <style>
         :root {
-            --primary: #2563eb;
-            --bg: #ffffff;
-            --user-bg: #3b82f6;
-            --ai-bg: #f1f5f9;
-            --text: #1e293b;
+            --primary: #6366f1;
+            --secondary: #4f46e5;
+            --bg: #0f172a;
+            --card-bg: #1e293b;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Segoe UI', system-ui, sans-serif;
         }
 
         body {
             background: var(--bg);
+            color: white;
             height: 100vh;
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            place-items: center;
         }
 
         .chat-container {
-            flex: 1;
-            padding: 1rem;
-            overflow-y: auto;
-            max-width: 800px;
-            margin: 0 auto;
             width: 100%;
+            max-width: 800px;
+            height: 90vh;
+            background: var(--card-bg);
+            border-radius: 1rem;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+            overflow: hidden;
+        }
+
+        .chat-header {
+            padding: 1.5rem;
+            background: linear-gradient(45deg, var(--primary), var(--secondary));
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: grid;
+            place-items: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
         }
 
         .message {
-            margin: 1rem 0;
-            padding: 1rem;
-            border-radius: 1rem;
             max-width: 80%;
+            padding: 1rem 1.25rem;
+            border-radius: 1rem;
             animation: fadeIn 0.3s ease;
         }
 
-        .user {
-            background: var(--user-bg);
-            color: white;
-            margin-left: auto;
+        .user-message {
+            background: var(--primary);
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
         }
 
-        .ai {
-            background: var(--ai-bg);
-            color: var(--text);
-            margin-right: auto;
-            border: 1px solid #e2e8f0;
+        .bot-message {
+            background: var(--card-bg);
+            border: 1px solid #334155;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            position: relative;
         }
 
         .input-container {
-            padding: 1rem;
-            background: var(--bg);
-            border-top: 1px solid #e2e8f0;
-        }
-
-        .input-box {
+            padding: 1.5rem;
+            border-top: 1px solid #334155;
             display: flex;
-            gap: 0.5rem;
-            max-width: 800px;
-            margin: 0 auto;
+            gap: 1rem;
         }
 
         input {
             flex: 1;
             padding: 1rem;
-            border: 1px solid #cbd5e1;
-            border-radius: 0.5rem;
-            font-size: 1rem;
+            background: #1e293b;
+            border: 1px solid #334155;
+            border-radius: 0.75rem;
+            color: white;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus {
+            border-color: var(--primary);
         }
 
         button {
             padding: 1rem 1.5rem;
             background: var(--primary);
-            color: white;
             border: none;
-            border-radius: 0.5rem;
+            border-radius: 0.75rem;
+            color: white;
             cursor: pointer;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 1rem;
+            gap: 0.5rem;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background: #64748b;
+            border-radius: 50%;
+            animation: bounce 1.4s infinite;
         }
 
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        @keyframes bounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-10px); }
+        }
     </style>
 </head>
 <body>
-    <div class="chat-container" id="chat">
-        <div class="message ai">
-            Hello! I'm Afg AI. Ask me anything.
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="logo">AI</div>
+            <h2>DeepSeek Assistant</h2>
         </div>
-    </div>
+        
+        <div class="chat-messages" id="chat-messages">
+            <div class="message bot-message">Hello! How can I help you today?</div>
+        </div>
 
-    <div class="input-container">
-        <div class="input-box">
-            <input type="text" id="input" placeholder="Type your message...">
-            <button onclick="sendMessage()">Send</button>
+        <div class="typing-indicator" id="typing-indicator">
+            <div class="dot"></div>
+            <div class="dot" style="animation-delay: 0.2s"></div>
+            <div class="dot" style="animation-delay: 0.4s"></div>
+        </div>
+
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Ask me anything...">
+            <button id="send-btn" onclick="sendMessage()">
+                <span>Send</span>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"/>
+                </svg>
+            </button>
         </div>
     </div>
 
     <script>
-        const chat = document.getElementById('chat');
-        const input = document.getElementById('input');
-
-        function addMessage(text, isUser) {
-            const msg = document.createElement('div');
-            msg.className = `message ${isUser ? 'user' : 'ai'}`;
-            msg.textContent = text;
-            chat.appendChild(msg);
-            chat.scrollTop = chat.scrollHeight;
-        }
+        const chatMessages = document.getElementById('chat-messages');
+        const userInput = document.getElementById('user-input');
+        const typingIndicator = document.getElementById('typing-indicator');
 
         async function sendMessage() {
-            const message = input.value.trim();
+            const message = userInput.value.trim();
             if (!message) return;
 
-            addMessage(message, true);
-            input.value = '';
+            // Add user message
+            addMessage(message, 'user');
+            userInput.value = '';
 
-            // Simulated AI response
-            const response = await getAIResponse(message);
-            addMessage(response, false);
+            // Show typing indicator
+            typingIndicator.style.display = 'flex';
+            
+            try {
+                // Replace with your API endpoint
+                const response = await fetch('YOUR_API_ENDPOINT', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer YOUR_API_KEY'
+                    },
+                    body: JSON.stringify({
+                        message: message
+                    })
+                });
+
+                const data = await response.json();
+                addMessage(data.response, 'bot');
+            } catch (error) {
+                addMessage('Sorry, there was an error processing your request.', 'bot');
+            } finally {
+                typingIndicator.style.display = 'none';
+            }
         }
 
-        async function getAIResponse(prompt) {
-            // Replace with real API call
-            return new Promise(resolve => {
-                setTimeout(() => {
-                    resolve(`I received: "${prompt}". This is a simulated response.`);
-                }, 1000);
-            });
+        function addMessage(content, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', `${sender}-message`);
+            messageDiv.textContent = content;
+            chatMessages.appendChild(messageDiv);
+            
+            // Auto-scroll to bottom
+            chatMessages.scrollTop = chatMessages.scrollHeight;
         }
 
-        // Enter key support
-        input.addEventListener('keypress', (e) => {
+        // Handle Enter key
+        userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') sendMessage();
         });
     </script>
